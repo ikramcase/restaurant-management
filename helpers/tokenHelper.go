@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Restaurant-Managment-system/database"
+	"golang-restaurant-management/database"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

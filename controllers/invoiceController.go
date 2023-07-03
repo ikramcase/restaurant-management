@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Restaurant-Managment-system/database"
-	"github.com/Restaurant-Managment-system/models"
+	"golang-restaurant-management/database"
+	"golang-restaurant-management/models"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

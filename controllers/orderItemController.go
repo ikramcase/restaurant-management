@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Restaurant-Managment-system/database"
-	"github.com/Restaurant-Managment-system/models"
+	"golang-restaurant-management/database"
+	"golang-restaurant-management/models"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -108,7 +109,7 @@ func ItemsByOrder(id string) (OrderItem []primitive.M, err error) {
 		panic(err)
 	}
 
-	if err = result.All(ctx, &OrderItems); err != nil {
+	if err = result.All(ctx, &OrderItem); err != nil {
 		panic(err)
 	}
 
@@ -121,7 +122,7 @@ func GetOrderItem() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
 		orderItemId := c.Param("order_item_id")
-		var orderItem model.orderItem
+		var orderItem models.OrderItem
 
 		err := orderItemCollection.FindOne(ctx, bson.M{"orderItem_id": orderItemId}).Decode(&orderItem)
 		defer cancel()
@@ -152,7 +153,7 @@ func CreateOrderItem() gin.HandlerFunc {
 		order_id := OrderItemOrderCreator(order)
 
 		for _, orderItem := range orderItemPack.Order_items {
-			orderItem.order_id = order_id
+			orderItem.Order_id = order_id
 
 			validationErr := validate.Struct(orderItem)
 
@@ -163,7 +164,7 @@ func CreateOrderItem() gin.HandlerFunc {
 			orderItem.ID = primitive.NewObjectID()
 			orderItem.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 			orderItem.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-			orderItem.order_item_id = orderItem.ID.Hex()
+			orderItem.Order_item_id = orderItem.ID.Hex()
 			var num = toFixed(*orderItem.Unit_price, 2)
 			orderItem.Unit_price = &num
 			orderItemToBeInserted = append(orderItemToBeInserted, orderItem)
@@ -190,15 +191,15 @@ func UpdateOrderItem() gin.HandlerFunc {
 		var updateObj primitive.D
 
 		if orderItem.Unit_price != nil {
-			updateObj = append(updateObj, bson.E{"unit_price", *&orderItem.unit_price})
+			updateObj = append(updateObj, bson.E{"unit_price", *&orderItem.Unit_price})
 		}
 
 		if orderItem.Quantity != nil {
-			updateObj = append(updateObj, bson.E{"quantity", *&orderItem.quantity})
+			updateObj = append(updateObj, bson.E{"quantity", *&orderItem.Quantity})
 		}
 
 		if orderItem.Food_id != nil {
-			updateObj = append(updateObj, bson.E{"food_id", *&orderItem.food_id})
+			updateObj = append(updateObj, bson.E{"food_id", *&orderItem.Food_id})
 		}
 
 		orderItem.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))

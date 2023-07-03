@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os/user"
 	"strconv"
 	"time"
 
-	"github.com/Restaurant-Managment-system/database"
-	helper "github.com/Restaurant-Managment-system/helpers"
-	"github.com/Restaurant-Managment-system/models"
+	"golang-restaurant-management/database"
+	helper "golang-restaurant-management/helpers"
+	"golang-restaurant-management/models"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -108,18 +108,18 @@ func SignUp() gin.HandlerFunc {
 
 		count, err = userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 		defer cancel()
-		if err!=nil{
+		if err != nil {
 			log.Panic(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error":"error occur whilw checking phone number"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occur whilw checking phone number"})
 			return
 		}
-		if count > 0{
-			c.JSON(http.StatusInternalServerError, gin.H{"error":"this email or phone number already exsit"})
+		if count > 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "this email or phone number already exsit"})
 			return
 		}
 
-		user.Created_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		user.Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.ID = primitive.NewObjectID()
 		user.User_id = user.ID.Hex()
 
@@ -128,7 +128,7 @@ func SignUp() gin.HandlerFunc {
 		user.Refresh_Token = &refreshToken
 
 		resultInsertionNumber, InsertErr := userCollection.InsertOne(ctx, user)
-		if InsertErr != nil{
+		if InsertErr != nil {
 			msg := fmt.Sprintf("user item was not created")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
 			return
@@ -149,21 +149,21 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		err:= userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
+		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
 		defer cancel()
-		if err != nil{
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "user not found, login seems to be incorrect"})
 			return
 		}
 
-		passwordIsValid, msg := VerifyPassword(*user.Password, *foundUser.password)
+		passwordIsValid, msg := VerifyPassword(*user.Password, *foundUser.Password)
 		defer cancel()
-		if passwordIsValid!=true{
-			c.JSON(http.StatusInternalServerError, gin.H{"error":msg})
+		if passwordIsValid != true {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
 			return
 		}
 
-		token, refreshToken, _ :=  helper.GenerateAllTokens(*foundUser.Email, foundUser.First_name, foundUser.Last_name, foundUser.User_id)
+		token, refreshToken, _ := helper.GenerateAllTokens(*foundUser.Email, *foundUser.First_name, *foundUser.Last_name, foundUser.User_id)
 
 		helper.UpdateAllTokens(token, refreshToken, foundUser.User_id)
 
@@ -172,20 +172,20 @@ func Login() gin.HandlerFunc {
 }
 
 func HashPassword(password string) string {
-bytes, err := bcrypt.GenerateFromPassword([]byte(password))
-if err!=nil{
-	log.Panic(err)
-}
-return string(bytes)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		log.Panic(err)
+	}
+	return string(bytes)
 }
 
 func VerifyPassword(userPassword string, providePassword string) (bool, string) {
-err:=bcrypt.CompareHashAndPassword([]byte(providePassword), []byte(userPassword))
-check:=true
-msg:=""
-if err!=nil{
-	msg= fmt.Sprintf("login or password incorrect")
-	check = false
-}
-return check, msg
+	err := bcrypt.CompareHashAndPassword([]byte(providePassword), []byte(userPassword))
+	check := true
+	msg := ""
+	if err != nil {
+		msg = fmt.Sprintf("login or password incorrect")
+		check = false
+	}
+	return check, msg
 }

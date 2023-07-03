@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Restaurant-Managment-system/models"
+	"golang-restaurant-management/models"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -54,7 +55,7 @@ func CreateMenu() gin.HandlerFunc {
 
 		result, insertErr := menuCollection.InsertOne(ctx, menu)
 		if insertErr != nil {
-			msg := fmt.Println("menu item in not created")
+			msg, _ := fmt.Println("menu item in not created")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
 			return
 		}
@@ -91,8 +92,8 @@ func UpdateMenu() gin.HandlerFunc {
 				return
 			}
 
-			updateObj = append(updateObj, bson.E{"start_date": menu.Start_date})
-			updateObj = append(updateObj, bson.E{"end_date": menu.End_date})
+			updateObj = append(updateObj, bson.E{"start_date", menu.Start_Date})
+			updateObj = append(updateObj, bson.E{"end_date", menu.End_Date})
 
 			if menu.Name != "" {
 				updateObj = append(updateObj, bson.E{"name": menu.Name})

@@ -3,7 +3,7 @@ package routes
 import (
 	controller "golang-restaurant-management/controllers"
 
-	"github.com/gin-gonic.gin/gin"
+	"github.com/gin-gonic/gin"
 )
 
 func OrderRoutes(incomingRoutes *gin.Engine) {

@@ -9,8 +9,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Restaurant-Managment-system/database"
-	"github.com/Restaurant-Managment-system/models"
+	"golang-restaurant-management/database"
+	"golang-restaurant-management/models"
+
 	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	helper "github.com/Restaurant-Managment-system/helpers"
+	helper "golang-restaurant-management/helpers"
+
 	"github.com/gin-gonic/gin"
 )
 
