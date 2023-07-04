@@ -3,20 +3,35 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
+	"golang-restaurant-management/database"
 	"golang-restaurant-management/models"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var menuCollection *mongo.Collection = database.OpenCollection(database.Client, "menu")
+
 func GetMenus() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		result, err := menuCollection.Find(context.TODO(), bson.M{})
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing the menu items"})
+		}
+		var allMenus []bson.M
+		if err = result.All(ctx, &allMenus); err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, allMenus)
 	}
 }
 
@@ -92,15 +107,15 @@ func UpdateMenu() gin.HandlerFunc {
 				return
 			}
 
-			updateObj = append(updateObj, bson.E{"start_date", menu.Start_Date})
-			updateObj = append(updateObj, bson.E{"end_date", menu.End_Date})
+			updateObj = append(updateObj, bson.E{"start_date", menu.Start_date})
+			updateObj = append(updateObj, bson.E{"end_date", menu.End_date})
 
 			if menu.Name != "" {
-				updateObj = append(updateObj, bson.E{"name": menu.Name})
+				updateObj = append(updateObj, bson.E{"name", menu.Name})
 
 			}
 			if menu.Catagory != "" {
-				updateObj = append(updateObj, bson.E{"category": menu.Catagory})
+				updateObj = append(updateObj, bson.E{"category", menu.Catagory})
 
 			}
 
@@ -127,7 +142,7 @@ func UpdateMenu() gin.HandlerFunc {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
 			}
 			defer cancel()
-			return
+			c.JSON(http.StatusOK, result)
 
 		}
 	}

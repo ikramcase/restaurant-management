@@ -23,7 +23,7 @@ func GetTables() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
-		result, err := orderCollection.FindOne(context.TODO(), bson.M{})
+		result, err := orderCollection.Find(context.TODO(), bson.M{})
 		defer cancel()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing table items"})

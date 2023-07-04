@@ -33,7 +33,7 @@ var invoiceCollection *mongo.Collection = database.OpenCollection(database.Clien
 func GetInvoices() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-		result, err := invoiceCollection.FindOne(context.TODO(), bson.M{})
+		result, err := invoiceCollection.Find(context.TODO(), bson.M{})
 		defer cancel()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing invoice items"})
